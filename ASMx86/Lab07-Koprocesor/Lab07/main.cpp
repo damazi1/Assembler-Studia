@@ -106,7 +106,40 @@ float asm04_ff(float a, float b) {
 float asm05_ff(float a, float b) {
     float y = 0.0f;
     __asm {
-
+        fldpi   ;//pi
+        fld a   ;//a, pi
+        fmul    ;//a*pi
+        mov eax, 180;
+        push eax;
+        fild [esp];//180, a*pi
+        fdiv    ;//(a*pi)/180 <- pierwszy kont w radianach k1
+        fldpi;
+        fld b;
+        fmul;
+        fild [esp];
+        pop eax;
+        fdiv;//k2, k1
+        fld st;
+        fmul;//k2^2, k1
+        fcos;//cos(k2^2), k1
+        fld1;
+        fld1;
+        fadd;
+        fmul;//2cos(k2)^2, k1
+        fxch;//k1, k2ob
+        fld st;
+        fld st;
+        fmul;
+        fmul;
+        fsin;//sin(k1)^3
+        fld1;
+        fld1;
+        fadd;
+        fld st;
+        fadd;
+        fmul;//4sin(k1)^2, k2ob
+        fsubr;
+        fstp y; //<empty>
     }
     return y;
 }
@@ -114,7 +147,32 @@ float asm05_ff(float a, float b) {
 float asm06_ff(float a, float b) {
     float y = 0.0f;
     __asm {
-
+        fld a;//a
+        fld b;//b, a
+        fld1;
+        fadd;
+        fdiv;//a/(b+1)
+        fld1;
+        fadd;//1+a/(b+1)
+        fld st;
+        fmul;
+        fld1;
+        fxch;
+        fyl2x;//log2(1+a/(b+1) <-p1
+        fld b; //b, p1
+        fld a;
+        fld1;
+        fadd; //a+1, b, p1
+        fdiv;
+        fld1;
+        fadd;
+        fld st;
+        fmul;
+        fld1;
+        fxch;
+        fyl2x;
+        fadd;
+        fstp y;
     }
     return y;
 }
@@ -137,16 +195,50 @@ float asm07_ff(float* a, int n) {
     return y;
 }
 
-void  asm08_vf(float* a, float* b, int size) {
+void  asm08_vf(float* a, float* b, int n) {
     __asm {
-
+        mov ecx, n; //ecx <- size
+        mov esi, b; // esi <- base address float * a
+        mov edi, a
+    _loop:
+        fld dword ptr[esi + 4 * ecx - 4];//a[i]
+        fld st;//a[i], a[i]
+        fld st;
+        fld st;
+        fmul;
+        fmul;//x[i]^3, x[i]
+        fld1;
+        fld1;
+        fadd;
+        fld st;
+        fadd;
+        fld1;
+        fadd;//5, x[i]^3, x[i]
+        fmul;
+        fsubr;
+        fstp dword ptr[edi + 4 * ecx - 4]; //<empty>
+        dec ecx;
+        jnz _loop;
     }
 }
 
 double asm01_dd(double a, double b, double c) {
     double y = 0.0f;
     __asm {
-
+        fld b;
+        fld st;
+        fmul;//b^2
+        fld a;
+        fld c;
+        fmul;
+        fld1;
+        fld1;
+        fadd;
+        fld st;
+        fadd;
+        fmul;//4ac, b^2
+        fsub;
+        fstp y;
     }
     return y;
 }
@@ -154,7 +246,16 @@ double asm01_dd(double a, double b, double c) {
 double asm02_dd(double a, double b, double c) {
     double y = 0.0f;
     __asm {
-
+        fld a;
+        fld b;
+        fadd;
+        fld c;
+        fmul;
+        fld1;
+        fld1;
+        fadd;
+        fdiv;
+        fstp y;
     }
     return y;
 }
@@ -162,7 +263,30 @@ double asm02_dd(double a, double b, double c) {
 double asm03_dd(double a, double b, double c) {
     double y = 0.0f;
     __asm {
-
+        fld a;//a
+        fld b;//b,a
+        fadd;//a+b
+        fld st;
+        fld st;
+        fmul;
+        fmul;//(a+b)^3
+        fld1;
+        fld1;
+        fadd;
+        fld st;
+        fadd;//4, (a+b)^3
+        fmul;//4(a+b)^3
+        fld a;
+        fld c;
+        fadd;//a+c , w1
+        fld st;
+        fmul;
+        fld1;
+        fld1;
+        fadd;
+        fmul;
+        fsub;
+        fstp y;
     }
     return y;
 }
@@ -170,7 +294,26 @@ double asm03_dd(double a, double b, double c) {
 double asm04_dd(double a, double b) {
     double y = 0.0f;
     __asm {
-
+        fld1;//1
+        fld b;//b, 1
+        fabs;
+        fld st;
+        fld st;
+        fmul;
+        fmul;//b^3, 1
+        fdiv;
+        fsqrt;
+        fld1;
+        fld a;
+        fld st;
+        fmul;
+        fdiv;
+        fld1;
+        fadd;
+        fadd;
+        fld st;
+        fmul;
+        fstp y;
     }
     return y;
 }
@@ -178,7 +321,40 @@ double asm04_dd(double a, double b) {
 double asm05_dd(double a, double b) {
     double y = 0.0f;
     __asm {
-
+        fldpi;//pi
+        fld a;//a, pi
+        fmul;//a*pi
+        mov eax, 180;
+        push eax;
+        fild[esp];//180, a*pi
+        fdiv;//(a*pi)/180 <- pierwszy kont w radianach k1
+        fldpi;
+        fld b;
+        fmul;
+        fild[esp];
+        pop eax;
+        fdiv;//k2, k1
+        fld st;
+        fmul;//k2^2, k1
+        fcos;//cos(k2^2), k1
+        fld1;
+        fld1;
+        fadd;
+        fmul;//2cos(k2)^2, k1
+        fxch;//k1, k2ob
+        fld st;
+        fld st;
+        fmul;
+        fmul;
+        fsin;//sin(k1)^3
+        fld1;
+        fld1;
+        fadd;
+        fld st;
+        fadd;
+        fmul;//4sin(k1)^2, k2ob
+        fsubr;
+        fstp y; //<empty>
     }
     return y;
 }
@@ -186,29 +362,98 @@ double asm05_dd(double a, double b) {
 double asm06_dd(double a, double b) {
     double y = 0.0f;
     __asm {
-
+        fld a;//a
+        fld b;//b, a
+        fld1;
+        fadd;
+        fdiv;//a/(b+1)
+        fld1;
+        fadd;//1+a/(b+1)
+        fld st;
+        fmul;
+        fld1;
+        fxch;
+        fyl2x;//log2(1+a/(b+1) <-p1
+        fld b; //b, p1
+        fld a;
+        fld1;
+        fadd; //a+1, b, p1
+        fdiv;
+        fld1;
+        fadd;
+        fld st;
+        fmul;
+        fld1;
+        fxch;
+        fyl2x;
+        fadd;
+        fstp y;
     }
     return y;
 }
 
-double asm07_dd(double* a, int size) {
+double asm07_dd(double* a, int n) {
     double y = 0.0f;
     __asm {
-
+        mov ecx, n; //ecx <- size of array
+        mov esi, a;
+        fldz;// sum
+    _loop:
+        fld qword ptr[esi + 8 * ecx - 8];
+        fld st;
+        fmul;
+        fadd;
+        dec ecx;
+        jnz _loop;
+        fstp y;
     }
     return y;
 }
 
-void  asm08_vd(double* a, double* b, int size) {
+void  asm08_vd(double* a, double* b, int n) {
     __asm {
-
+            mov ecx, n; //ecx <- size
+            mov esi, b; // esi <- base address float * a
+            mov edi, a
+            _loop:
+            fld qword ptr[esi + 8 * ecx - 8];//a[i]
+            fld st;//a[i], a[i]
+            fld st;
+            fld st;
+            fmul;
+            fmul;//x[i]^3, x[i]
+            fld1;
+            fld1;
+            fadd;
+            fld st;
+            fadd;
+            fld1;
+            fadd;//5, x[i]^3, x[i]
+            fmul;
+            fsubr;
+            fstp qword ptr[edi + 8 * ecx - 8]; //<empty>
+            dec ecx;
+            jnz _loop;
     }
 }
 
 double asm01_df(float a, float b, float c) {
     float y = 0.0f;
     __asm {
-
+        fld b;
+        fld st;
+        fmul;//b^2
+        fld a;
+        fld c;
+        fmul;
+        fld1;
+        fld1;
+        fadd;
+        fld st;
+        fadd;
+        fmul;//4ac, b^2
+        fsub;
+        fstp y;
     }
     return y;
 }
@@ -216,7 +461,16 @@ double asm01_df(float a, float b, float c) {
 double asm02_df(float a, float b, float c) {
     float y = 0.0f;
     __asm {
-
+        fld a;
+        fld b;
+        fadd;
+        fld c;
+        fmul;
+        fld1;
+        fld1;
+        fadd;
+        fdiv;
+        fstp y;
     }
     return y;
 }
@@ -224,7 +478,30 @@ double asm02_df(float a, float b, float c) {
 double asm03_df(float a, float b, float c) {
     float y = 0.0f;
     __asm {
-
+        fld a;//a
+        fld b;//b,a
+        fadd;//a+b
+        fld st;
+        fld st;
+        fmul;
+        fmul;//(a+b)^3
+        fld1;
+        fld1;
+        fadd;
+        fld st;
+        fadd;//4, (a+b)^3
+        fmul;//4(a+b)^3
+        fld a;
+        fld c;
+        fadd;//a+c , w1
+        fld st;
+        fmul;
+        fld1;
+        fld1;
+        fadd;
+        fmul;
+        fsub;
+        fstp y;
     }
     return y;
 }
@@ -232,7 +509,26 @@ double asm03_df(float a, float b, float c) {
 double asm04_df(float a, float b) {
     float y = 0.0f;
     __asm {
-
+        fld1;//1
+        fld b;//b, 1
+        fabs;
+        fld st;
+        fld st;
+        fmul;
+        fmul;//b^3, 1
+        fdiv;
+        fsqrt;
+        fld1;
+        fld a;
+        fld st;
+        fmul;
+        fdiv;
+        fld1;
+        fadd;
+        fadd;
+        fld st;
+        fmul;
+        fstp y;
     }
     return y;
 }
@@ -240,7 +536,40 @@ double asm04_df(float a, float b) {
 double asm05_df(float a, float b) {
     float y = 0.0f;
     __asm {
-
+        fldpi;//pi
+        fld a;//a, pi
+        fmul;//a*pi
+        mov eax, 180;
+        push eax;
+        fild[esp];//180, a*pi
+        fdiv;//(a*pi)/180 <- pierwszy kont w radianach k1
+        fldpi;
+        fld b;
+        fmul;
+        fild[esp];
+        pop eax;
+        fdiv;//k2, k1
+        fld st;
+        fmul;//k2^2, k1
+        fcos;//cos(k2^2), k1
+        fld1;
+        fld1;
+        fadd;
+        fmul;//2cos(k2)^2, k1
+        fxch;//k1, k2ob
+        fld st;
+        fld st;
+        fmul;
+        fmul;
+        fsin;//sin(k1)^3
+        fld1;
+        fld1;
+        fadd;
+        fld st;
+        fadd;
+        fmul;//4sin(k1)^2, k2ob
+        fsubr;
+        fstp y; //<empty>
     }
     return y;
 }
@@ -248,7 +577,32 @@ double asm05_df(float a, float b) {
 double asm06_df(float a, float b) {
     float y = 0.0f;
     __asm {
-
+        fld a;//a
+        fld b;//b, a
+        fld1;
+        fadd;
+        fdiv;//a/(b+1)
+        fld1;
+        fadd;//1+a/(b+1)
+        fld st;
+        fmul;
+        fld1;
+        fxch;
+        fyl2x;//log2(1+a/(b+1) <-p1
+        fld b; //b, p1
+        fld a;
+        fld1;
+        fadd; //a+1, b, p1
+        fdiv;
+        fld1;
+        fadd;
+        fld st;
+        fmul;
+        fld1;
+        fxch;
+        fyl2x;
+        fadd;
+        fstp y;
     }
     return y;
 }
@@ -256,7 +610,17 @@ double asm06_df(float a, float b) {
 double asm07_df(float* a, int size) {
     float y = 0.0f;
     __asm {
-
+        mov ecx, n; //ecx <- size of array
+        mov esi, a;
+        fldz;// sum
+    _loop:
+        fld qword ptr[esi + 8 * ecx - 8];
+        fld st;
+        fmul;
+        fadd;
+        dec ecx;
+        jnz _loop;
+        fstp y;
     }
     return y;
 }

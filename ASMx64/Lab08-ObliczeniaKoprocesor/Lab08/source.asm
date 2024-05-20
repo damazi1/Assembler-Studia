@@ -1,4 +1,4 @@
-.data
+﻿.data
 _180f   DD 180.0    ; fld
 _180i   DD 180      ; fild
 
@@ -30,8 +30,48 @@ local y:dword ;declare local variable y in scope of this procedure
     movss xmm0, y       ; prepare xmm0 for return
     ret
 asm01 ENDP
-
+; xmm0 <- float a;
+; xmm1 <- float x;
 asm02 PROC
+local y:dword
+    movss a, xmm0
+    movss x, xmm1
+    fld a
+    fld x
+    fmul    ;ax
+    fld1
+    fld1
+    fadd;
+    fld st;
+    fld st;
+    fadd;
+    fadd    ;6, ax
+    fadd    ;6+ax
+    fsqrt   ;root(ax+6)
+    fld1;
+    fld1;
+    fadd; 2, r
+    fld st
+    fadd; 4, r
+    fld st;
+    fadd; 8, r
+    fmul    ;8*sqrt(ax+6) <- w1
+    fld x;
+    fld st;
+    fmul;
+    fld st;
+    fmul; x^4, w1
+    fld1;
+    fadd; 1+x^4, w1
+    fld1
+    fyl2x
+    fldl2e
+    fdiv
+    fld a
+    fmul
+    fadd
+    fstp y
+    movss xmm0, y
     ret
 asm02 ENDP
 

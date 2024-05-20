@@ -607,14 +607,14 @@ double asm06_df(float a, float b) {
     return y;
 }
 
-double asm07_df(float* a, int size) {
+double asm07_df(float* a, int n) {
     float y = 0.0f;
     __asm {
         mov ecx, n; //ecx <- size of array
         mov esi, a;
         fldz;// sum
     _loop:
-        fld qword ptr[esi + 8 * ecx - 8];
+        fld dword ptr[esi + 4 * ecx - 4];
         fld st;
         fmul;
         fadd;

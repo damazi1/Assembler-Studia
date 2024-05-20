@@ -31,7 +31,47 @@ local y:dword ;declare local variable y in scope of this procedure
     ret
 asm01 ENDP
 
-asm02 PROC
+asm02 PROC a:dword, x:dword
+    local y:dword
+    movss a, xmm0
+    movss x, xmm1;
+    fld a
+    fld x
+    fmul    ;ax
+    fld1
+    fld1
+    fadd;
+    fld st;
+    fld st;
+    fadd;
+    fadd    ;6, ax
+    fadd    ;6+ax
+    fsqrt   ;root(ax+6)
+    fld1;
+    fld1;
+    fadd; 2, r
+    fld st
+    fadd; 4, r
+    fld st;
+    fadd; 8, r
+    fmul    ;8*sqrt(ax+6) <- w1
+    fld x;
+    fld st;
+    fmul;
+    fld st;
+    fmul; x^4, w1
+    fld1;
+    fadd; 1+x^4, w1
+    fld1 ;1, 1+x^4, w1
+    fxch
+    fyl2x
+    fldl2e
+    fdiv
+    fld a
+    fmul
+    fadd
+    fstp y
+    movss xmm0, y
     ret
 asm02 ENDP
 
@@ -48,27 +88,77 @@ local y:dword, _switch:dword
 
     fld x               ; x
     mov _switch, -5
-    fld _switch         ; -5, x
+    fild _switch         ; -5, x
     fcomip st, st(1)    ; x
-    ja _case1           ; jump if (-5 > x)
+    jae _case1           ; jump if (-5 > x)
     fldz                ; 0, x
     fcomip st, st(1)    ; x
-    ja _case2           ; jump if (0 > x)
-    ; _case3
-_default:
-    ;...
+    jae _case2           ; jump if (0 > x)
+    mov _switch, 5      
+    fild _switch         ; 5, x
+    fcomip st, st(1)    ; x
+    jae _case3           ; jump if (5 > x)
+    
+    fldpi
+    fmul
+    mov _switch, 16
+    fild _switch
+    fmul
+    fsqrt
+    fld x
+    fld st
+    fmul
+    mov _switch, 32
+    fild _switch
+    fmul
+    fsqrt
+    fsub
+    
     jmp _end
 
 _case1:
-    ;...
+    fld st ;x, x
+    fmul    ;x^2
+    fld a; a, x^2
+    fmul ;a*x^2
+    fld b
+    fld x
+    fmul ;bx, ax^2
+    fld c
+    fadd
+    fadd    ;wynik
     jmp _end
 
 _case2:
-    ;...
+    fldpi ;pi, x
+    fmul;pi*x
+    fld _180f ;180.0 , pix
+    fdiv ;radians1
+    fld st
+    fmul ; radians1^2
+    fsin ; w1
+    fld x
+    fldpi
+    fmul
+    fld _180f;
+    fdiv
+    fld st
+    fmul
+    fcos
+    fadd
     jmp _end
 
+_case3:
+    fld st
+    fmul
+    fld a
+    fmul
+    fld x
+    fld1
+    fadd
+    fyl2x
 _end:
-    fstp y
+    fstp y  ;<empty>
     movss xmm0, y
     ret
 asm03 ENDP

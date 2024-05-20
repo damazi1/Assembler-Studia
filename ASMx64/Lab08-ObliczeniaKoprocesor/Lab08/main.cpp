@@ -82,7 +82,7 @@ void run(T(*cppFun)(T, T), T(*asmFun)(T, T), const char* str) {
 
 template <typename T>
 void run(T(*cppFun)(T, T, T, T), T(*asmFun)(T, T, T, T), const char* str) {
-    T a = rnd<T>(), b = rnd<T>(), c = rnd<T>(), x =-5;
+    T a = rnd<T>(), b = rnd<T>(), c = rnd<T>(), x =7;
     std::cout << str << std::endl;
 
     std::cout << "a    = " << std::setw(8) << a << std::endl;

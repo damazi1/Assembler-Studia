@@ -162,8 +162,52 @@ _end:
     movss xmm0, y
     ret
 asm03 ENDP
+; rcx <- float * x
+; rdx <- float * y
+; r8d <- u int n
+; xmm3 <- float a
+; esp <- float b
+; esp <- float xMin
+; esp <- float xMax
 
-asm04 PROC
+asm04 PROC x:dword, y:dword, n:dword, a:dword, b:dword, xMin:dword, xMax:dword
+local _s:dword
+    mov rsi, rcx
+    mov rdi, rdx
+    movsxd r8, r8d
+    push r8
+    movss a, xmm3
+    fld xMax ;xMax
+    fld xMin ; xMin, xMax
+    fsub    ; xMax-xMin
+    fild dword ptr [rsp] ; n, xMax-xMin
+    pop r8
+    fdiv    ; s
+    fstp _s ; _s <- s <empty>
+_loop:
+    fld dword ptr [rsi +4 * r8 - 4]; x[i]
+    fld st;
+    fldpi ; pi, x[i]
+    fmul
+    fld _180f
+    fdiv;
+    fld st;
+    fmul
+    fsin;
+    fld a;
+    fmul ; asin(pix/180)^2, x[i]
+    fxch ;
+    fldpi;
+    fmul
+    fld _180f
+    fdiv
+    fcos
+    fld b
+    fmul
+    fadd
+    fstp dword ptr [rdi +4 * r8 - 4];
+    dec r8
+    jnz _loop
     ret
 asm04 ENDP
 

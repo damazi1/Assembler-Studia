@@ -180,7 +180,7 @@ uint resultComparator(const T* const* expected, const T* const* actual, const ui
 /// <param name="max"></param>
 /// <returns>Random number of type T from a given range.</returns>
 template <typename T>
-T rnd(const int min = -100, const int max = 100) {
+T rnd(const int min = 0, const int max = 100) {
     // Note intentional warning C4244. For integer types loss of the fraction part is intentional.
     return static_cast<T>(rand() % (max - min) + min) / 100.0;
 }

@@ -43,7 +43,7 @@ template <typename T> void cpp01_07(T* a, uint n) {
     }
 }
 
-template <typename T> T cpp01_08(T* x, T* y, uint n, T a, T b) {
+template <typename T> void cpp01_08(T* x, T* y, uint n, T a, T b) {
     for (uint i = 0; i < n; ++i) {
         y[i] = std::fabs(a * x[i] * x[i] * x[i] + b);
     }

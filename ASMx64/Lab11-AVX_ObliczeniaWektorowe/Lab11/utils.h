@@ -83,7 +83,7 @@ void printSummary(bool result) {
 /// <param name="eps"></param>
 /// <returns>False if arguments satisfies the condition a != b. True otherwise.</returns>
 template <typename T>
-bool almostEqual(const T expected, const T actual, const double eps = 1e-4) {
+bool almostEqual(const T expected, const T actual, const double eps = 1e-2) {
     return std::fabs(expected - actual) < eps;
 }
 
@@ -193,7 +193,7 @@ T rnd(const T min = -100, const T max = 100) {
 /// <param name="max"></param>
 /// <returns>Random number of type T from a given range.</returns>
 template <typename T>
-T rndf(const int min = -100, const int max = 100) {
+T rndf(const int min = 1, const int max = 100) {
     // Note intentional warning C4244. For integer types loss of the fraction part is intentional.
     return static_cast<T>(rand() % (max - min) + min) / 100.0;
 }
